@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/main.ts",
-    "build": "tsc",
-    "start": "node dist/main.js",
+    "dev": "node init && tsx watch src/main.ts",
+    "build": "node init && tsc",
+    "start": "node init && node dist/main.js",
     "test": "vitest run",
     "e2e": "vitest run --config vitest.e2e.config.ts",
     "lint": "tsc --noEmit"
