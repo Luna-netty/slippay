@@ -44,6 +44,7 @@ import Empresas from "./pages/Empresas.tsx";
 import ComexBase from "./pages/ComexBase.tsx";
 import { ComexBaseProvider } from "./lib/comexBase.tsx";
 import BusinessLanding from "./pages/comex/BusinessLanding";
+import { PaymentRoute } from "./components/PaymentRoute.tsx";
 export default function App() {
   return (
     <Routes>
@@ -51,16 +52,18 @@ export default function App() {
       <Route path="/v3" element={<LandingV3 />} />
       <Route path="/zk" element={<ZkRedirect />} />
       <Route path="/cofrinho-landing" element={<LandingV2 />} />
-      <Route path="/receber" element={<Receber />} />
-      {import.meta.env.VITE_PAGFINANCE_ENABLED === "1" && <Route path="/pix-pay" element={<PixPay />} />}
+      <Route path="/receber" element={<PaymentRoute><Receber /></PaymentRoute>} />
+      {import.meta.env.VITE_PAGFINANCE_ENABLED === "1" && <Route path="/pix-pay" element={<PaymentRoute><PixPay /></PaymentRoute>} />}
       {import.meta.env.VITE_COMEX_ENABLED === "1" && (
         <Route path="/comex" element={
-          import.meta.env.VITE_PRIVY_APP_ID
-            ? <ComexBaseProvider><ComexBase /></ComexBaseProvider>
-            : <BusinessLanding />
+          <PaymentRoute>
+            {import.meta.env.VITE_PRIVY_APP_ID
+              ? <ComexBaseProvider><ComexBase /></ComexBaseProvider>
+              : <BusinessLanding />}
+          </PaymentRoute>
         } />
       )}
-      {import.meta.env.VITE_DEFINDEX_ENABLED === "1" && <Route path="/cofre" element={<Vault />} />}
+      {import.meta.env.VITE_DEFINDEX_ENABLED === "1" && <Route path="/cofre" element={<PaymentRoute><Vault /></PaymentRoute>} />}
       <Route path="/empresas" element={<Empresas />} />
       <Route path="/b2b" element={<Empresas />} />
       <Route path="/v1" element={<AgentHome />} />
@@ -69,11 +72,11 @@ export default function App() {
       <Route path="/human" element={<Home />} />
       <Route path="/verify" element={<Verify />} />
       <Route path="/agents" element={<Agents />} />
-      <Route path="/comprovante/:txhash" element={<Comprovante />} />
+      <Route path="/comprovante/:txhash" element={<PaymentRoute><Comprovante /></PaymentRoute>} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/checkout/:order_id" element={<Checkout />} />
-      <Route path="/sub/:id" element={<Sub />} />
+      <Route path="/checkout/:order_id" element={<PaymentRoute><Checkout /></PaymentRoute>} />
+      <Route path="/sub/:id" element={<PaymentRoute><Sub /></PaymentRoute>} />
       <Route path="/demo" element={<Demo />} />
       <Route path="/preview" element={<Preview />} />
       <Route path="/x402-demo" element={<X402Demo />} />
@@ -81,15 +84,15 @@ export default function App() {
       <Route path="/withdraw-demo" element={<WithdrawDemo />} />
       <Route path="/bio" element={<BioTest />} />
       <Route path="/pay" element={<PayDemo />} />
-      <Route path="/cobrar" element={<Cobrar />} />
+      <Route path="/cobrar" element={<PaymentRoute><Cobrar /></PaymentRoute>} />
       <Route path="/account" element={<Account />} />
-      <Route path="/buy" element={<Cash />} />
-      <Route path="/comprar" element={<Cash />} />
-      <Route path="/cash" element={<Cash />} />
-      <Route path="/pix" element={<Cash />} />
-      <Route path="/gate" element={<Gate />} />
+      <Route path="/buy" element={<PaymentRoute><Cash /></PaymentRoute>} />
+      <Route path="/comprar" element={<PaymentRoute><Cash /></PaymentRoute>} />
+      <Route path="/cash" element={<PaymentRoute><Cash /></PaymentRoute>} />
+      <Route path="/pix" element={<PaymentRoute><Cash /></PaymentRoute>} />
+      <Route path="/gate" element={<PaymentRoute><Gate /></PaymentRoute>} />
       <Route path="/loja" element={<Store />} />
-      <Route path="/s/:subId" element={<PolicySubscribe />} />
+      <Route path="/s/:subId" element={<PaymentRoute><PolicySubscribe /></PaymentRoute>} />
       <Route path="/docs" element={<Docs />} />
       <Route path="/docs/*" element={<Docs />} />
       <Route path="/seguranca" element={<Security />} />
