@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import { AuthProvider } from "./lib/auth.tsx";
 import { ChainProvider } from "./components/ChainProvider.tsx";
+import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
 import "@fontsource/space-grotesk/400.css";
 import "@fontsource/space-grotesk/500.css";
 import "@fontsource/space-grotesk/600.css";
@@ -36,13 +37,15 @@ import "@fontsource/jetbrains-mono/600.css";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <ChainProvider>
-          <App />
-        </ChainProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </React.StrictMode>,
+  <ErrorBoundary boundary="root" route={window.location.pathname}>
+    <React.StrictMode>
+      <BrowserRouter>
+        <AuthProvider>
+          <ChainProvider>
+            <App />
+          </ChainProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </React.StrictMode>
+  </ErrorBoundary>,
 );

@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "node api.js && pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
     "supabase:start": "supabase start",
