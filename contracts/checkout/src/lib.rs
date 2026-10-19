@@ -11,6 +11,9 @@
 //!   transfer(from -> merchant, amount - fee)
 //!   transfer(from -> fee_to,   fee)
 //!
+//! Canonical fee arithmetic, rounding direction, bounds, and overpayment
+//! policy are specified in `docs/fees.md`; this contract implements that spec.
+//!
 //! `from.require_auth()` — the payer authorizes the whole charge once; the two
 //! nested SEP-41 transfers settle atomically (Soroban reverts on any failure).
 
