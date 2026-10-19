@@ -2,13 +2,17 @@ import { signWebhook } from "./crypto.js";
 import { log } from "./log.js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { isSafeWebhookUrl, validateWebhookUrl, pinnedDispatcher } from "./ssrf.js";
+import { randomUUID } from "node:crypto";
 
-const SCHEDULE = [60, 300, 1800, 7200, 43200, 86400];
+const SCHEDUL = [60, 300, 1800, 7200, 43200, 86400];
 
 // Response body bytes we read+keep (rest is discarded after abort). Audit-003 L13.
 const MAX_RESPONSE_BODY_BYTES = 64 * 1024;
 // Hard ceiling on a single delivery attempt (per-call timeout).
 const REQUEST_TIMEOUT_MS = 10_000;
+// How long a claim is visible before another worker may reclaim it.
+// Must exceed REQUEST_TIMEOUT_MS so a live attempt is never reclaimed out from under it.
+const CLAIM_VISIBILITY_MS = REQUEST_TIMEOUT_MS * 3;
 
 export function nextBackoff(attempt: number): number | null {
   return SCHEDULE[attempt] ?? null;
@@ -113,17 +117,89 @@ function concat(chunks: Uint8Array[]): Uint8Array {
   return out;
 }
 
-export function startWebhookWorker(db: SupabaseClient, allowLocal: boolean) {
+export interface ClaimedDelivery {
+  id: string;
+  order_id: string;
+  payload: unknown;
+  attempt_n: number;
+  status: string;
+  owner_id?: string | null;
+  orders?: {
+    merchants?: { webhook_url?: string; webhook_secret?: string; network?: string } | null;
+  } | null;
+}
+
+/**
+ * Reclaim deliveries whose claim (delivering + visibility deadline) has expired.
+ * A crashed worker leaves a row stuck in 'delivering'; this returns it to the
+ * pool by resetting it to 'failed' with its next_attempt_at in the past.
+ */
+export async function reclaimExpiredClaims(db: SupabaseClient): Promise<void> {
+  const now = new Date().toISOString();
+  await db.from("webhook_deliveries")
+    .update({ status: "failed", owner_id: null, visible_at: null })
+    .eq("status", "delivering")
+    .lt("visible_at", now);
+}
+
+/**
+ * Atomically claim up to `limit` due deliveries for this worker.
+ *
+ * Shape: select candidate ids, then for each do a conditional CAS update
+ * (compare-and-swap) that only succeeds if the row is still queued/failed and
+ * due. The update returns the row only if this worker won the claim. Two
+ * concurrent workers cannot both claim the same row because the second update
+ * sees status='delivering' and matches zero rows.
+ */
+export async function claimDeliveries(
+  db: SupabaseClient,
+  ownerId: string,
+  limit = 50,
+): Promise<ClaimedDelivery[]> {
+  const now = new Date();
+  const nowIso = now.toISOString();
+  const visibleAt = new Date(now.getTime() + CLAIM_VISIBILITY_MS).toISOString();
+
+  // Reclaim first so any row stranded by a crashed worker becomes a candidate.
+  await reclaimExpiredClaims(db);
+
+  const { data: candidates } = await db.from("webhook_deliveries")
+    .select("id")
+    .in("status", ["queued", "failed"])
+    .lte("next_attempt_at", nowIso)
+    .order("next_attempt_at", { ascending: true })
+    .limit(limit);
+
+  if (!candidates || candidates.length === 0) return [];
+
+  const claimedIds: string[] = [];
+  for (const candidate of candidates) {
+    // Compare-and-swap: only transition queued|failed -> delivering if the row
+    // is still in a claimable state and due. Returns the row only on win.
+    const { data: won } = await db.from("webhook_deliveries")
+      .update({ status: "delivering", owner_id: ownerId, visible_at: visibleAt })
+      .eq("id", candidate.id)
+      .in("status", ["queued", "failed"])
+      .lte("next_attempt_at", nowIso)
+      .select("id");
+    if (won && won.length > 0) claimedIds.push(candidate.id);
+  }
+
+  if (claimedIds.length === 0) return [];
+
+  // Fetch the full rows (including merchant join) for the rows we own.
+  const { data: rows } = await db.from("webhook_deliveries")
+    .select("id, order_id, payload, attempt_n, status, owner_id, orders ( merchants ( webhook_url, webhook_secret, network ) )")
+    .in("id", claimedIds);
+  return (rows as ClaimedDelivery[] || []);
+}
+
+export function startWebhookWorker(db: SupabaseClient, allowLocal: boolean, ownerId: string = `worker-${randomUUID()}`) {
   let stopped = false;
 
   async function tick() {
     while (!stopped) {
-      const { data: rows } = await db.from("webhook_deliveries")
-        .select("id, order_id, payload, attempt_n, status, orders ( merchants ( webhook_url, webhook_secret, network ) )")
-        .in("status", ["queued", "failed"])
-        .lte("next_attempt_at", new Date().toISOString())
-        .order("next_attempt_at", { ascending: true })
-        .limit(50);
+      const rows = await claimDeliveries(db, ownerId, 50);
 
       if (!rows || rows.length === 0) {
         await new Promise(r => setTimeout(r, 5000));
@@ -131,14 +207,14 @@ export function startWebhookWorker(db: SupabaseClient, allowLocal: boolean) {
       }
 
       for (const row of rows) {
-        const merchant = (row as any).orders?.merchants as { webhook_url?: string; webhook_secret?: string; network?: string };
+        const merchant = row.orders?.merchants as { webhook_url?: string; webhook_secret?: string; network?: string } | null | undefined;
         if (!merchant?.webhook_url) {
-          await db.from("webhook_deliveries").update({ status: "dead", response_body: "no_webhook_url" }).eq("id", row.id);
+          await db.from("webhook_deliveries").update({ status: "dead", response_body: "no_webhook_url", owner_id: null, visible_at: null }).eq("id", row.id).eq("owner_id", ownerId);
           continue;
         }
         // Sync pre-flight: cheap URL-shape rejection before DNS cost.
         if (!isSafeWebhookUrl(merchant.webhook_url, allowLocal)) {
-          await db.from("webhook_deliveries").update({ status: "dead", response_body: "unsafe_url" }).eq("id", row.id);
+          await db.from("webhook_deliveries").update({ status: "dead", response_body: "unsafe_url", owner_id: null, visible_at: null }).eq("id", row.id).eq("owner_id", ownerId);
           continue;
         }
 
@@ -152,14 +228,18 @@ export function startWebhookWorker(db: SupabaseClient, allowLocal: boolean) {
 
         const newAttempt = (row.attempt_n as number) + 1;
         if (result.status === "sent") {
+          // Guard the write on owner_id so a reclaimed-and-re-claimed row can't
+          // be overwritten by a stale worker.
           await db.from("webhook_deliveries").update({
             status: "sent",
             response_code: result.code,
             response_body: result.body,
             attempt_n: newAttempt,
             last_attempt_at: new Date().toISOString(),
-          }).eq("id", row.id);
-          log("info", "webhook_sent", { id: row.id, code: result.code });
+            owner_id: null,
+            visible_at: null,
+          }).eq("id", row.id).eq("owner_id", ownerId);
+          log("info", "webhook_sent", { id: row.id, code: result.code, owner: ownerId });
         } else {
           const backoff = nextBackoff(newAttempt - 1);
           await db.from("webhook_deliveries").update({
@@ -171,8 +251,10 @@ export function startWebhookWorker(db: SupabaseClient, allowLocal: boolean) {
             next_attempt_at: backoff === null
               ? new Date().toISOString()
               : new Date(Date.now() + backoff * 1000).toISOString(),
-          }).eq("id", row.id);
-          log("warn", "webhook_failed", { id: row.id, attempt: newAttempt, backoff });
+            owner_id: null,
+            visible_at: null,
+          }).eq("id", row.id).eq("owner_id", ownerId);
+          log("warn", "webhook_failed", { id: row.id, attempt: newAttempt, backoff, owner: ownerId });
         }
       }
     }
