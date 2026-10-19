@@ -4,6 +4,9 @@ on:
   push:
     branches:
     - main
+  workflow_dispatch: null
+  schedule:
+  - cron: '0 6 * * 1'
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -23,6 +26,8 @@ jobs:
     - uses: supabase/setup-cli@b60b5899c73b63a2d2d651b1e90db8d4c9392f51
       with:
         version: latest
+    - name: Bootstrap (documented local flow)
+      run: bash scripts/bootstrap.sh --ci
     - name: Install
       run: pnpm install --frozen-lockfile
     - name: Build shared (consumed by web + listener)
@@ -32,7 +37,9 @@ jobs:
     - name: Workspace tests (shared, web, listener)
       run: pnpm -r test
     - name: Start local Supabase stack
-      run: supabase start
+      run: supabase start --ignore-health-check || supabase start
+    - name: Wait for Supabase ready
+      run: bash scripts/wait-for-supabase.sh
     - name: API edge function tests (deno)
       env:
         SUPABASE_URL: http://127.0.0.1:54321
@@ -47,6 +54,18 @@ jobs:
       run: pnpm --filter @slippay/web build
     - name: Build listener
       run: pnpm --filter @slippay/listener build
+    - name: Contract tests (Rust)
+      run: bash scripts/test-contracts.sh
+    - name: AXL gate (z3)
+      run: bash scripts/test-axl-gate.sh
     - name: Stop Supabase
       if: always()
       run: supabase stop || true
+    - name: Upload bootstrap logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: bootstrap-logs
+        path: |
+          .bootstrap/*.log
+        if-no-files-found: ignore
