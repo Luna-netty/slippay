@@ -2,6 +2,13 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { MatchOutcome, OrderForMatch } from "./matcher.js";
 import { log } from "./log.js";
 
+// Overpayment policy (docs/fees/overpayment-policy.md):
+//   accept-and-record. The excess is persisted on the order as the
+//   surplus, and a surplus at or above the threshold raises an alert.
+// The matcher is the source of truth for the comparison tolerance; this
+// constant must match the one referenced in matcher.ts.
+export const OVERPAYMENT_ALERT_THRESHOLD_STROOPS = 10000000; // 10 USDC (7 decimals)
+
 export async function reconcileMatch(
   db: SupabaseClient,
   order: OrderForMatch & { merchant_id: string },
@@ -20,8 +27,27 @@ export async function reconcileMatch(
     ? ["pending", "underpaid"]
     : ["pending"];
 
+  // Overpayment is accepted and recorded: persist expected, received and the
+  // surplus so the reconciliation surface can refund/credit later.
+  const isPaid = outcome.outcome === "paid";
+  const expectedStroops = isPaid ? outcome.expected : null;
+  const receivedStroops = isPaid ? outcome.received : null;
+  const surplusStroops = isPaid ? outcome.surplus : null;
+  const hasSurplus = isPaid && surplusStroops != null && surplusStroops > 0;
+
+  const updatePatch: Record<string, unknown> = {
+    status: newStatus,
+    tx_hash: txHash,
+    paid_at: newStatus === "paid" ? new Date().toISOString() : null,
+  };
+  if (isPaid) {
+    updatePatch.expected_stroops = expectedStroops;
+    updatePatch.received_stroops = receivedStroops;
+    updatePatch.surplus_stroops = surplusStroops;
+  }
+
   const { data, error } = await db.from("orders")
-    .update({ status: newStatus, tx_hash: txHash, paid_at: newStatus === "paid" ? new Date().toISOString() : null })
+    .update(updatePatch)
     .eq("id", order.id)
     .in("status", allowedPriorStatuses)
     .select("*").single();
@@ -68,6 +94,7 @@ export async function reconcileMatch(
       memo: order.memo,
       paid_at: data.paid_at,
       ...(outcome.outcome === "underpaid" ? { expected: outcome.expected, received: outcome.received } : {}),
+      ...(isPaid ? { expected: expectedStroops, received: receivedStroops, surplus: surplusStroops } : {}),
     },
   };
 
@@ -89,10 +116,50 @@ export async function reconcileMatch(
     }
   }
 
+  // Alert when the surplus is large enough to suggest a duplicate or a
+  // transposed amount. The alert is recorded as a webhook delivery so it
+  // surfaces on the merchant's reconciliation feed and is deduped on replay.
+  if (hasSurplus && surplusStroops >= OVERPAYMENT_ALERT_THRESHOLD_STROOPS) {
+    const alertPayload = {
+      type: "order.overpaid_alert",
+      data: {
+        id: order.id,
+        subscription_id: subscriptionId,
+        external_ref: data.external_ref,
+        tx_hash: txHash,
+        memo: order.memo,
+        expected: expectedStroops,
+        received: receivedStroops,
+        surplus: surplusStroops,
+        threshold: OVERPAYMENT_ALERT_THRESHOLD_STROOPS,
+      },
+    };
+    const { error: alertError } = await db.from("webhook_deliveries").insert({
+      order_id: order.id,
+      type: alertPayload.type,
+      payload: alertPayload,
+    });
+    if (alertError) {
+      const code = (alertError as { code?: string }).code;
+      if (code === "23505") {
+        log("info", "overpayment_alert_dedup", { order_id: order.id });
+      } else {
+        log("warn", "overpayment_alert_failed", { order_id: order.id, error: alertError.message });
+      }
+    }
+    log("warn", "overpayment_alert", {
+      order_id: order.id,
+      expected: expectedStroops,
+      received: receivedStroops,
+      surplus: surplusStroops,
+    });
+  }
+
   log("info", "order_reconciled", {
     order_id: order.id,
     subscription_id: subscriptionId,
     status: newStatus,
     tx_hash: txHash,
+    ...(isPaid ? { expected: expectedStroops, received: receivedStroops, surplus: surplusStroops } : {}),
   });
 }

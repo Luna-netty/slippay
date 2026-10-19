@@ -20,14 +20,34 @@ export interface OrderForMatch {
 }
 
 export type MatchOutcome =
-  | { outcome: "paid" }
+  | {
+      outcome: "paid";
+      // Money math is in stroops (BigInt); the string forms here are the
+      // canonical 7-decimal representation persisted against the order.
+      // expected = merchant net share (after platform fee); received = the
+      // amount on the payment event; surplus = received - expected.
+      expected: string;
+      received: string;
+      surplus: string;
+      // True when surplus > configured threshold. The reconciler uses this
+      // to emit an alert in addition to the normal order.paid webhook.
+      alert: boolean;
+    }
   | { outcome: "underpaid"; expected: string; received: string }
   | { outcome: "ignore"; reason?: string };
+
+/**
+ * Default overpayment alert threshold in stroops (1 USDC = 10^7 stroops).
+ * A surplus at or below this is accepted-and-recorded silently; above
+ * it raises an alert. See docs/fees-overpayment-policy.md.
+ */
+export const DEFAULT_OVERPAYMENT_THRESHOLD_STROOPS = 1_000_000n ; // 1.0000000 USDC
 
 export function matchPaymentToOrder(
   ev: StellarPaymentEvent,
   order: OrderForMatch,
   network: "TESTNET" | "PUBLIC",
+  overpaymentThresholdStroops: bigint = DEFAULT_OVERPAYMENT_THRESHOLD_STROOPS,
 ): MatchOutcome {
   if (!ev.successful) return { outcome: "ignore", reason: "not_successful" };
   if (ev.memo_type !== "hash") return { outcome: "ignore", reason: "memo_type" };
@@ -66,9 +86,22 @@ export function matchPaymentToOrder(
   }
   // Floor division here is conservative: integer division truncates toward
   // zero, so the merchant receives at most the mathematically correct amount.
-  const expectedStroops = (totalStroops * BigInt(10_000 - order.platform_fee_bp)) / 10_000n;
+  const expectedStroops = (totalStroops * BigInt(10_000 - order.platform_fee_bp)) / 10_000n ;
   const expectedMerchantShare = stroopsToStellar(expectedStroops);
-  if (receivedStroops >= expectedStroops) return { outcome: "paid" };
+  if (receivedStroops >= expectedStroops) {
+    // Overpayment policy: accept-and-record. The surplus (if any) is
+    // returned in the outcome and persisted against the order by the
+    // reconciler. A surplus above the configured threshold also raises
+    // an alert. See docs/fees-overpayment-policy.md.
+    const surplusStroops = receivedStroops - expectedStroops;
+    return {
+      outcome: "paid",
+      expected: expectedMerchantShare,
+      received: ev.amount,
+      surplus: stroopsToStellar(surplusStroops),
+      alert: surplusStroops > overpaymentThresholdStroops,
+    };
+  }
   return { outcome: "underpaid", expected: expectedMerchantShare, received: ev.amount };
 }
 
@@ -86,7 +119,7 @@ export function stellarToStroops(s: string): bigint {
 export function stroopsToStellar(n: bigint): string {
   const sign = n < 0n ? "-" : "";
   const abs = n < 0n ? -n : n;
-  const intPart = abs / 10_000_000n;
-  const fracPart = abs % 10_000_000n;
+  const intPart = abs / 10_000_000n ;
+  const fracPart = abs % 10_000_000n ;
   return `${sign}${intPart}.${fracPart.toString().padStart(7, "0")}`;
 }
