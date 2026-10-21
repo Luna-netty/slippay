@@ -14,7 +14,7 @@ const SENSITIVE_ERROR =
   "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.abcdefghij " +
   "receiver GCEYFLGNHCW4EIEX5LAVYGIGPT2KLHHVB6EOUWKKALA2FT7RMCHI242P";
 
-function Bomb({ message = SENSITIVE_ERROR }: { message?: string }) {
+function Bomb({ message = SENSITIVE_ERROR }: { message?: string }): never {
   throw new Error(message);
 }
 
@@ -108,7 +108,7 @@ describe("ErrorBoundary", () => {
     expect(fallbackText).not.toContain("GCEYFLGNHCW4EIEX5LAVYGIGPT2KLHHVB6EOUWKKALA2FT7RMCHI242P");
 
     expect(reports).toHaveLength(1);
-    const report = reports[0];
+    const report = reports[0]!;
     expect(report.route).toBe("/checkout/ord_77");
     expect(report.orderRef).toBe("ord_77");
     const serialized = JSON.stringify(report);
@@ -151,9 +151,9 @@ describe("PaymentRoute", () => {
     expect(screen.getByRole("alert")).toBeTruthy();
     expect(screen.getByText("ord_123")).toBeTruthy();
     expect(reports).toHaveLength(1);
-    expect(reports[0].route).toBe("/checkout/ord_123");
-    expect(reports[0].orderRef).toBe("ord_123");
-    expect(reports[0].boundary).toBe("payment");
+    expect(reports[0]!.route).toBe("/checkout/ord_123");
+    expect(reports[0]!.orderRef).toBe("ord_123");
+    expect(reports[0]!.boundary).toBe("payment");
   });
 
   it("isolates a payment route failure behind the fallback", () => {
@@ -177,7 +177,7 @@ describe("PaymentRoute", () => {
     );
 
     expect(screen.getByRole("alert")).toBeTruthy();
-    expect(reports[0].boundary).toBe("payment");
-    expect(reports[0].orderRef).toBeUndefined();
+    expect(reports[0]!.boundary).toBe("payment");
+    expect(reports[0]!.orderRef).toBeUndefined();
   });
 });

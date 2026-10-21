@@ -60,16 +60,20 @@ config.
 
 ## Caps / invariants
 
-- `fee_bps` is fixed at construction and validated `<= 10_000`. No setter exists.
-- `fee_to` is fixed at construction. No setter exists. The merchant cannot
-  redirect the fee.
-- `amount > 0` required.
-- Atomicity: net-to-merchant and fee-to-platform settle together or not at all.
+- **Canonical Specification:** Implements the fee rules defined in [`docs/fees.md`](../fees.md).
+- **Rate Range:** `fee_bps` is fixed at construction and validated `0 <= fee_bps <= 10_000` (basis points, 0% to 100%). Constructor rejects values `> 10_000` with `Error::BadConfig`. No setter exists.
+- **Immutable Recipient:** `fee_to` is fixed at construction. No setter exists; the merchant cannot redirect the fee.
+- **Rounding Direction:** Truncating integer division (`floor`). Remainder dust from inexact division (`(amount * fee_bps) % 10_000`) is discarded from the fee and retained by the merchant, favouring the merchant by up to 1 base unit (stroop). SlipPay never overcharges.
+- **Identity Invariant:** `net + fee == amount` holds identically across all amounts (zero dust lost or created).
+- **Zero-Fee / Micro-Payment Behavior:** If `amount * fee_bps < 10_000` (or `fee_bps == 0`), `fee == 0` and `net == amount`. The transfer to `fee_to` is omitted entirely (`if fee > 0`), performing only a single transfer to the merchant.
+- **Zero-Net Behavior:** If `fee_bps == 10_000` (100% platform take), `net == 0` and `fee == amount`. The merchant receives a valid 0-amount transfer, and `fee_to` receives the entire amount.
+- **Atomicity & Revert Guarantee:** The payer authorizes the charge once via `from.require_auth()`. If either transfer leg fails (e.g., insufficient balance, invalid token), Soroban atomically reverts the entire transaction; funds are never moved partially.
+- **Off-Chain Ledger Mapping:** On-chain `amount - fee` directly mirrors the off-chain `orders.usdc_amount - orders.fee_usdc` accounting equation persisted by the API routes.
 
 A note on fee figures: the fee is a configured parameter of the deployed
 instance. The API default is 297 bp (2.97%); this testnet checkout contract was
 deployed with `fee_bps = 300` (3%). A mainnet checkout deployment should be
-constructed with the canonical 297 bp to match the API.
+constructed with the canonical 297 bp (`DEFAULT_PLATFORM_FEE_BP`) to match the API. See [`contracts/checkout/DEPLOYMENT.md`](../../contracts/checkout/DEPLOYMENT.md).
 
 ## Status & honest limitations
 

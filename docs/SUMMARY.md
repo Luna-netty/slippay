@@ -12,6 +12,7 @@
 * [Proof-bounded settlement](concepts/proof-bounded-settlement.md)
 * [Agent-integrity attestation](concepts/agent-integrity-attestation.md)
 * [Non-custodial settlement](concepts/non-custodial-settlement.md)
+* [Fee arithmetic and rounding](fees.md)
 * [Regulatory framing](concepts/regulatory.md)
 
 ## Contracts
