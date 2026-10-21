@@ -1,0 +1,41 @@
+# Review ownership for the paths that a build-time compromise would need.
+#
+# Context: in October 2026 this repository was hit by the PolinRider campaign,
+# which merged an obfuscated loader into `apps/web/postcss.config.cjs` and
+# added Windows push-automation files to `.gitignore`. Both are now removed
+# from every branch and from history. These rules make the same change
+# require a second pair of eyes next time.
+#
+# Enforcing this needs "Require review from Code Owners" enabled on `main` in
+# branch protection; the file alone is advisory.
+
+# --- build and tooling config: the loader's favourite hiding place ---------
+*postcss.config.*   @BIGSMKE12 @davy-patty @Obaara293
+*tailwind.config.*  @BIGSMKE12 @davy-patty @Obaara293
+*eslint.config.*    @BIGSMKE12 @davy-patty @Obaara293
+*next.config.*      @BIGSMKE12 @davy-patty @Obaara293
+*vite.config.*      @BIGSMKE12 @davy-patty @Obaara293
+*webpack.config.*   @BIGSMKE12 @davy-patty @Obaara293
+*babel.config.*     @BIGSMKE12 @davy-patty @Obaara293
+*tsconfig*.json     @BIGSMKE12 @davy-patty @Obaara293
+.gitignore          @BIGSMKE12 @davy-patty @Obaara293
+.npmrc              @BIGSMKE12 @davy-patty @Obaara293
+
+# --- dependency graph ------------------------------------------------------
+package.json        @BIGSMKE12 @davy-patty @Obaara293
+pnpm-lock.yaml      @BIGSMKE12 @davy-patty @Obaara293
+
+# --- anything that runs on its own -----------------------------------------
+/.vscode/           @BIGSMKE12 @davy-patty @Obaara293
+/.devcontainer/     @BIGSMKE12 @davy-patty @Obaara293
+/.github/           @BIGSMKE12 @davy-patty @Obaara293
+/.husky/            @BIGSMKE12 @davy-patty @Obaara293
+
+# --- binaries and fonts: opaque blobs need a human -------------------------
+*.woff              @BIGSMKE12 @davy-patty @Obaara293
+*.woff2             @BIGSMKE12 @davy-patty @Obaara293
+*.eot               @BIGSMKE12 @davy-patty @Obaara293
+*.ttf               @BIGSMKE12 @davy-patty @Obaara293
+*.otf               @BIGSMKE12 @davy-patty @Obaara293
+*.node              @BIGSMKE12 @davy-patty @Obaara293
+*.wasm              @BIGSMKE12 @davy-patty @Obaara293

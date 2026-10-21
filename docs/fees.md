@@ -19,6 +19,18 @@ must reject such a rate rather than coerce it.
 
   in the contract the constructor rejects `fee_bps > 10_000`.
 
+### Defined Bounds
+
+| Constant / Bound | Value | Percentage | Enforcement Location |
+|---|---|---|---|
+| **Minimum Rate** | `0 bp` | 0.00% | `orders.platform_fee_bp >= 0` CHECK constraint |
+| **Default Rate** | `297 bp` | 2.97% | `DEFAULT_PLATFORM_FEE_BP` in `@slippay/shared` |
+| **Merchant Config Max** | `1000 bp` | 10.00% | `orders_platform_fee_bp_check` DB constraint |
+| **Protocol Hard Ceiling** | `10000 bp` | 100.00% | Smart contract constructor (`CheckoutError::BadConfig`) |
+
+* **Per-Merchant Override:** The fee rate is stored on `merchants.platform_fee_bp` and defaults to `297` (`DEFAULT_PLATFORM_FEE_BP`).
+* **Order Snapshot:** When an order is created, `orders.platform_fee_bp` snapshots the merchant's current fee rate, making the fee for that order immutable.
+
 ## Formula
 
 Given a gross amount `G` (in the smallest integer unit of the asset — stroops for Stellar
@@ -50,6 +62,10 @@ The remainder of an inexact division is at most 9,000 basis-point-units of the g
 denominator (that is, less than one basis-point of `G — at most 9999/10000 of a basis
 point), so it is always sub-cent and never accumulates into a visible amount on a single
 payment.
+
+### Conservation of Funds
+* **Zero Dust Variance:** No base units are created or lost during the split.
+* **Never calculate net independently via division:** Computing $\text{net} = \lfloor \text{gross} \times (10000 - \text{fee\_bp}) / 10000 \rfloor$ produces a 1-unit dust mismatch when division is inexact ($\text{net} + \text{fee} = \text{gross} - 1$). The net share **must** always be derived as $\text{gross} - \text{fee}$.
 
 ## Persisted columns and identities
 
@@ -194,6 +210,37 @@ the asset's human decimal form and in its base unit.
 - Outcome: `underpaid`; expected `9.0000000`, received `8.9999999`. The order is not
 
   settled and is recorded for reconciliation.
+
+### Vector 1: Standard Exact Settlement
+* **Gross:** `100.0000000 USDC` ($1,000,000,000$ stroops)
+* **Fee Rate:** `297 bp` (2.97%)
+* $\text{fee} = \lfloor 1,000,000,000 \times 297 / 10,000 \rfloor = 29,700,000 \text{ stroops}$ (`2.9700000 USDC`)
+* $\text{net} = 1,000,000,000 - 29,700,000 = 970,300,000 \text{ stroops}$ (`97.0300000 USDC`)
+* **Sum Check:** $970,300,000 + 29,700,000 = 1,000,000,000 \text{ stroops}$ (`100.0000000 USDC`) $\checkmark$
+
+### Vector 2: Inexact Division (Fractional Remainder)
+* **Gross:** `1.0000001 USDC` ($10,000,001$ stroops)
+* **Fee Rate:** `297 bp` (2.97%)
+* Raw product: $10,000,001 \times 297 = 2,970,000,297$
+* $\text{fee} = \lfloor 2,970,000,297 / 10,000 \rfloor = 297,000 \text{ stroops}$ (`0.0297000 USDC`)
+* Remainder: $297 / 10,000 = 0.0297 \text{ stroops}$ (discarded from fee)
+* $\text{net} = 10,000,001 - 297,000 = 9,703,001 \text{ stroops}$ (`0.9703001 USDC`)
+* **Sum Check:** $9,703,001 + 297,000 = 10,000,001 \text{ stroops}$ $\checkmark$
+* *Note: The 0.0297 stroop remainder stays with the merchant.*
+
+### Vector 3: Sub-Cent / Micro-Payment
+* **Gross:** `0.0000001 USDC` ($1$ stroop)
+* **Fee Rate:** `297 bp`
+* $\text{fee} = \lfloor 1 \times 297 / 10,000 \rfloor = 0 \text{ stroops}$
+* $\text{net} = 1 - 0 = 1 \text{ stroop}$
+* **Sum Check:** $1 + 0 = 1 \text{ stroop}$ $\checkmark$
+
+### Vector 4: Zero-Fee Account
+* **Gross:** `50.0000000 USDC` ($500,000,000$ stroops)
+* **Fee Rate:** `0 bp`
+* $\text{fee} = 0 \text{ stroops}$
+* $\text{net} = 500,000,000 \text{ stroops}$ (`50.0000000 USDC`)
+* **Sum Check:** $500,000,000 + 0 = 500,000,000 \text{ stroops}$ $\checkmark$
 
 ## Implementation map
 

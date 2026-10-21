@@ -7,7 +7,7 @@ import {
 } from "./errorReport.ts";
 
 const JWT =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmF6ZSIsInJvbGUiOiJhdXRoZW50aWNhdGVkIn0.abcdefghijklmnopqrstuvwxyz012345";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBwYXBlemUiLCJyb2xlIjoiYXV0aGVudGljYXRlZCJ9.abcdefghijklmnopqrstuvwxyz012345";
 const STELLAR_ADDRESS = "GCEYFLGNHCW4EIEX5LAVYGIGPT2KLHHVB6EOUWKKALA2FT7RMCHI242P";
 const EVM_ADDRESS = "0xE669C6Fe0493044D085C3cD08fb0289b53fA4449";
 
@@ -63,7 +63,7 @@ describe("reportRenderError", () => {
     });
 
     expect(reports).toHaveLength(1);
-    const report = reports[0];
+    const report = reports[0]!;
     expect(report.boundary).toBe("payment");
     expect(report.route).toBe("/checkout/ord_42");
     expect(report.orderRef).toBe("ord_42");
@@ -74,7 +74,7 @@ describe("reportRenderError", () => {
 
   it("normalizes non-Error values", () => {
     reportRenderError({ error: "boom", boundary: "root" });
-    expect(reports[0].message).toBe("boom");
-    expect(reports[0].boundary).toBe("root");
+    expect(reports[0]!.message).toBe("boom");
+    expect(reports[0]!.boundary).toBe("root");
   });
 });

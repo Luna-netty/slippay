@@ -1,4 +1,5 @@
 import { TransactionBuilder, Networks, StrKey } from "@stellar/stellar-sdk";
+import { stellarToStroops } from "@slippay/shared";
 
 const PASS: Record<string, string> = { TESTNET: Networks.TESTNET, PUBLIC: Networks.PUBLIC };
 
@@ -45,12 +46,22 @@ export function assertPaymentMatches(
   if (pay.assetCode !== expect.assetCode) {
     throw new Error(`guard: ativo divergente (${pay.assetCode} vs ${expect.assetCode})`);
   }
-  const got = Number(pay.amount);
-  const want = Number(expect.amount);
-  if (!Number.isFinite(got) || !Number.isFinite(want)) {
+  if (!pay.amount || typeof pay.amount !== "string") {
     throw new Error("guard: valor não numérico");
   }
-  if (Math.abs(got - want) > 1e-7) {
+  // Money math runs in stroops (BigInt) to avoid IEEE-754 boundary errors at
+  // the 7th decimal (Audit-003 L4 / Issue #315). Both sides are parsed into
+  // integer stroops and compared for exact equality.
+  let gotStroops: bigint;
+  let wantStroops: bigint;
+  try {
+    gotStroops = stellarToStroops(pay.amount);
+    wantStroops = stellarToStroops(expect.amount);
+  } catch {
+    throw new Error("guard: valor não numérico");
+  }
+  if (gotStroops !== wantStroops) {
     throw new Error(`guard: valor divergente (assinaria ${pay.amount}, esperado ${expect.amount})`);
   }
 }
+

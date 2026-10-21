@@ -7,13 +7,14 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "node api.js && pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:reset": "supabase db reset",
     "api:test": "deno test --allow-all supabase/functions/api/test/",
+    "check:schema": "node scripts/check-schema-alignment.mjs",
     "policy-checkout:spike": "NODE_PATH=apps/web/node_modules node scripts/policy-checkout-spike-server.mjs"
   },
   "devDependencies": {

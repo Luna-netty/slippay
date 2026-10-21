@@ -14,6 +14,34 @@ const r = new Hono<{ Variables: Vars }>();
 
 const CHECKOUT_BASE = Deno.env.get("CHECKOUT_BASE_URL") ?? "http://localhost:5173";
 
+// Money is returned as a string at the column's declared scale. PostgREST hands
+// `numeric` back as a JSON number, which loses the trailing zeros the caller
+// sent ("10.50" -> 10.5) and exposes float artefacts. The scale comes from the
+// column definitions so it is never guessed:
+//   brl_amount    numeric(12,2)  -> 2dp
+//   usd_amount    numeric(18,2)  -> 2dp
+//   usdc_amount   numeric(12,7)  -> 7dp
+//   rate_brl_usdc numeric(12,7)  -> 7dp
+//   fee_usdc      numeric(20,7)  -> 7dp
+// usdc_amount deliberately keeps 7dp even for USD orders: it also carries
+// BRL-derived amounts (brl / rate), where 2dp would truncate real precision.
+function fixed(value: unknown, dp: number): unknown {
+  if (value == null) return value;
+  const n = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(n) ? n.toFixed(dp) : value;
+}
+
+function serializeOrder<T extends Record<string, unknown>>(o: T) {
+  return {
+    ...o,
+    brl_amount: fixed(o.brl_amount, 2),
+    usd_amount: fixed(o.usd_amount, 2),
+    usdc_amount: fixed(o.usdc_amount, 7),
+    rate_brl_usdc: fixed(o.rate_brl_usdc, 7),
+    fee_usdc: fixed(o.fee_usdc, 7),
+  };
+}
+
 r.post("/", requireApiKey, async (c) => {
   const merchant = c.get("merchant");
   const sb = c.get("supabase");
@@ -53,10 +81,11 @@ r.post("/", requireApiKey, async (c) => {
   const minutes = input.expires_in_minutes ?? ORDER_DEFAULT_EXPIRY_MINUTES;
   const expiresAt = new Date(Date.now() + minutes * 60_000).toISOString();
 
-  // Platform fee. `usdc` (gross) is what the buyer pays; merchant net = gross −
-  // fee; fee_usdc is SlipPay's 0.98% cut, persisted per order so capture model A
-  // (off-chain invoice) has a ledger to bill from. Persisting is the accounting —
-  // capture routes fee_usdc to SlipPay via the monthly invoice.
+  // Platform fee calculation per canonical specification: see docs/fees.md.
+  // `usdc` (gross) is what the buyer pays; merchant net = gross − fee; fee_usdc is
+  // persisted per order so capture model A (off-chain invoice) has a ledger to
+  // bill from, maintaining the invariant: net + fee == gross.
+  // Default fee rate is governed by DEFAULT_PLATFORM_FEE_BP (297 bp = 2.97%).
   const feeBp = Number((merchant as { platform_fee_bp?: number }).platform_fee_bp ?? DEFAULT_PLATFORM_FEE_BP);
   const grossUsdc = parseFloat(usdc);
   const feeUsdc = (grossUsdc * feeBp / 10_000).toFixed(7);
@@ -88,7 +117,7 @@ r.post("/", requireApiKey, async (c) => {
   const token = await signCheckoutToken(data.id as string);
 
   return c.json({
-    order: data,
+    order: serializeOrder(data as Record<string, unknown>),
     checkout_url: `${CHECKOUT_BASE}/checkout/${data.id}?t=${token}`,
     fee: {
       platform_fee_bp: feeBp,
@@ -103,7 +132,13 @@ r.get("/", requireApiKeyOrJwt, async (c) => {
   const merchant = c.get("merchant");
   const sb = c.get("supabase");
   const status = c.req.query("status");
-  const limit = LimitQuerySchema.parse(c.req.query("limit"));
+  let limit: number;
+  try {
+    limit = LimitQuerySchema.parse(c.req.query("limit"));
+  } catch (e: unknown) {
+    const issues = (e as { issues?: unknown }).issues ?? (e as { errors?: unknown }).errors ?? [];
+    return c.json({ error: "validation_error", issues }, 400);
+  }
   let q = sb.from("orders").select("*").eq("merchant_id", merchant.id)
     .order("created_at", { ascending: false }).limit(limit);
   if (status) q = q.eq("status", status);
@@ -112,12 +147,7 @@ r.get("/", requireApiKeyOrJwt, async (c) => {
     const m = mapDbError(error);
     return c.json({ error: m.code }, m.status as 400 | 409);
   }
-  const orders = (data ?? []).map((o: Record<string, unknown>) => ({
-    ...o,
-    brl_amount: typeof o.brl_amount === "number"
-      ? o.brl_amount.toFixed(2)
-      : o.brl_amount,
-  }));
+  const orders = (data ?? []).map((o: Record<string, unknown>) => serializeOrder(o));
   return c.json({ orders });
 });
 
@@ -145,7 +175,7 @@ r.get("/:id", async (c) => {
   if (error || !data) return c.json({ error: "not_found" }, 404);
   // Serve the PINNED recipient (snapshotted at creation), not a live merchant
   // lookup — so the address the buyer pays cannot drift after consent.
-  return c.json({ order: data });
+  return c.json({ order: serializeOrder(data as Record<string, unknown>) });
 });
 
 r.post("/:id/cancel", requireApiKey, async (c) => {
@@ -157,7 +187,7 @@ r.post("/:id/cancel", requireApiKey, async (c) => {
     .eq("id", id).eq("merchant_id", merchant.id).eq("status", "pending")
     .select("*").maybeSingle();
   if (error || !data) return c.json({ error: "cannot_cancel" }, 400);
-  return c.json({ order: data });
+  return c.json({ order: serializeOrder(data as Record<string, unknown>) });
 });
 
 export default r;

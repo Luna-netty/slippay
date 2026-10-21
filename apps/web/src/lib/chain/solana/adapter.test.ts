@@ -105,7 +105,7 @@ describe("solanaAdapter · payOneTime", () => {
     await expect(solanaAdapter.payOneTime(args)).resolves.toEqual({ hash: "SOLANA_SIGNATURE" });
 
     expect(mandate.buildPaySplitIx).toHaveBeenCalledTimes(1);
-    const [conn, buildArgs] = mandate.buildPaySplitIx.mock.calls[0];
+    const [conn, buildArgs] = mandate.buildPaySplitIx.mock.calls[0]!;
     expect(conn).toBeDefined();
     expect(buildArgs).toMatchObject({
       payer: new PublicKey(buyer),
@@ -138,7 +138,7 @@ describe("solanaAdapter · approveRecurring", () => {
 
     expect(mandate.mandatePda).toHaveBeenCalledTimes(1);
     expect(execute).toHaveBeenCalledTimes(1);
-    const [ixs] = execute.mock.calls[0];
+    const [ixs] = execute.mock.calls[0]!;
     expect(Array.isArray(ixs)).toBe(true);
     expect(ixs).toHaveLength(1);
     // The SPL `approve` delegate must be the derived mandate PDA.
