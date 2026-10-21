@@ -1,6 +1,7 @@
 {
   "version": "5",
   "specifiers": {
+    "npm:@stellar/stellar-sdk@*": "15.1.0",
     "npm:@stellar/stellar-sdk@13": "13.3.0",
     "npm:@stellar/stellar-sdk@15": "15.1.0",
     "npm:@supabase/supabase-js@2.45.4": "2.45.4",
@@ -35,7 +36,8 @@
       ],
       "optionalDependencies": [
         "sodium-native"
-      ]
+      ],
+      "deprecated": true
     },
     "@stellar/stellar-base@15.0.0": {
       "integrity": "sha512-XQhxUr9BYiEcFcgc4oWcCMR9QJCny/GmmGsuwPKf/ieIcOeb5149KLHYx9mJCA0ea8QbucR2/GzV58QbXOTxQA==",
@@ -46,7 +48,8 @@
         "bignumber.js",
         "buffer",
         "sha.js"
-      ]
+      ],
+      "deprecated": true
     },
     "@stellar/stellar-sdk@13.3.0": {
       "integrity": "sha512-8+GHcZLp+mdin8gSjcgfb/Lb6sSMYRX6Nf/0LcSJxvjLQR0XHpjGzOiRbYb2jSXo51EnA6kAV5j+4Pzh5OUKUg==",
