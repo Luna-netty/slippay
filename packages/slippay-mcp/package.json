@@ -11,7 +11,9 @@
     "url": "git+https://github.com/Galmanus/slippay.git",
     "directory": "packages/slippay-mcp"
   },
-  "bugs": { "url": "https://github.com/Galmanus/slippay/issues" },
+  "bugs": {
+    "url": "https://github.com/Galmanus/slippay/issues"
+  },
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -23,17 +25,26 @@
     "spending-limit",
     "x402"
   ],
-  "bin": { "slippay-mcp": "./dist/index.js" },
+  "bin": {
+    "slippay-mcp": "./dist/index.js"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "README.md"],
-  "engines": { "node": ">=18" },
-  "publishConfig": { "access": "public" },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "node init && tsc",
     "test": "vitest run",
     "lint": "tsc --noEmit",
-    "start": "node dist/index.js",
+    "start": "node init && node dist/index.js",
     "prepublishOnly": "npm run build && npm run test"
   },
   "dependencies": {

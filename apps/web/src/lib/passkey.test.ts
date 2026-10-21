@@ -28,6 +28,13 @@ function rawToDer(raw: Uint8Array): Uint8Array {
 const toHex = (b: Uint8Array): string =>
   Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
 
+/**
+ * crypto.subtle takes a BufferSource, i.e. a view over a plain ArrayBuffer.
+ * A Uint8Array is Uint8Array<ArrayBufferLike>, which may sit on a
+ * SharedArrayBuffer, so narrow it by copying before handing it over.
+ */
+const buf = (b: Uint8Array): Uint8Array<ArrayBuffer> => new Uint8Array(b);
+
 const P256_N = 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551n;
 
 async function p256Pair() {
@@ -35,11 +42,11 @@ async function p256Pair() {
 }
 
 async function signDer(privateKey: CryptoKey, msg: Uint8Array): Promise<Uint8Array> {
-  return rawToDer(new Uint8Array(await subtle.sign({ name: "ECDSA", hash: "SHA-256" }, privateKey, msg)));
+  return rawToDer(new Uint8Array(await subtle.sign({ name: "ECDSA", hash: "SHA-256" }, privateKey, buf(msg))));
 }
 
 function verifyP256(pub: CryptoKey, raw64: Uint8Array, msg: Uint8Array): Promise<boolean> {
-  return subtle.verify({ name: "ECDSA", hash: "SHA-256" }, pub, raw64, msg);
+  return subtle.verify({ name: "ECDSA", hash: "SHA-256" }, pub, buf(raw64), buf(msg));
 }
 
 afterEach(() => {
