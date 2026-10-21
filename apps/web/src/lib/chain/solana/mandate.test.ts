@@ -100,7 +100,9 @@ describe("SlippayMandate", () => {
   it("charge delegates to the agent and passes the mandate + token accounts", async () => {
     const rpc = vi.fn(async () => "CHARGE_SIG");
     const accounts = vi.fn(() => ({ rpc }));
-    const charge = vi.fn(() => ({ accounts }));
+    // Declare the parameter so mock.calls is [arg][] rather than the empty
+    // tuple [] — the assertion below reads the amount off that argument.
+    const charge = vi.fn((_: unknown) => ({ accounts }));
     anchor.methods.charge = charge;
 
     const agent = Keypair.generate().publicKey;
@@ -112,7 +114,7 @@ describe("SlippayMandate", () => {
       m.charge({ owner, mint, agent, ownerToken, recipientToken, amount: new BN(500) }),
     ).resolves.toBe("CHARGE_SIG");
 
-    expect(String(charge.mock.calls[0][0])).toBe("500");
+    expect(String(charge.mock.calls[0]![0])).toBe("500");
     expect(accounts).toHaveBeenCalledWith({
       agent, mandate: mandatePda(owner, mint), mint,
       ownerToken, recipientToken, tokenProgram: TOKEN_PROGRAM_ID,

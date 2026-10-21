@@ -63,7 +63,7 @@ describe("reportRenderError", () => {
     });
 
     expect(reports).toHaveLength(1);
-    const report = reports[0];
+    const report = reports[0]!;
     expect(report.boundary).toBe("payment");
     expect(report.route).toBe("/checkout/ord_42");
     expect(report.orderRef).toBe("ord_42");
@@ -74,7 +74,7 @@ describe("reportRenderError", () => {
 
   it("normalizes non-Error values", () => {
     reportRenderError({ error: "boom", boundary: "root" });
-    expect(reports[0].message).toBe("boom");
-    expect(reports[0].boundary).toBe("root");
+    expect(reports[0]!.message).toBe("boom");
+    expect(reports[0]!.boundary).toBe("root");
   });
 });
