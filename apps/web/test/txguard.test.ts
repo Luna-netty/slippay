@@ -75,5 +75,60 @@ describe("assertPaymentMatches", () => {
     const s = decodeTx(twoPaymentXdr(), "PUBLIC");
     expect(() => assertPaymentMatches(s, { destination: DEST, amount: "10", assetCode: "USDC" })).toThrow(/exatamente 1/);
   });
+
+  it("strictly rejects a 1-stroop difference at the 7th decimal (Issue #315)", () => {
+    // 10.5000000 vs 10.5000001 (exactly 1 stroop difference)
+    const s = decodeTx(sampleXdr("10.5000000"), "PUBLIC");
+    expect(() =>
+      assertPaymentMatches(s, { destination: DEST, amount: "10.5000001", assetCode: "USDC" })
+    ).toThrow(/valor divergente/);
+
+    expect(() =>
+      assertPaymentMatches(s, { destination: DEST, amount: "10.4999999", assetCode: "USDC" })
+    ).toThrow(/valor divergente/);
+
+    // 0.0000001 vs 0.0000002 (smallest unit 1 stroop difference)
+    const sMin = decodeTx(sampleXdr("0.0000001"), "PUBLIC");
+    expect(() =>
+      assertPaymentMatches(sMin, { destination: DEST, amount: "0.0000002", assetCode: "USDC" })
+    ).toThrow(/valor divergente/);
+  });
+
+  it("strictly rejects malformed or unparseable amount strings in guard", () => {
+    const s = decodeTx(sampleXdr("10.5"), "PUBLIC");
+    expect(() =>
+      assertPaymentMatches(s, { destination: DEST, amount: "not_a_number", assetCode: "USDC" })
+    ).toThrow(/valor não numérico/);
+
+    expect(() =>
+      assertPaymentMatches(s, { destination: DEST, amount: "-10.5", assetCode: "USDC" })
+    ).toThrow(/valor não numérico/);
+
+    expect(() =>
+      assertPaymentMatches(s, { destination: DEST, amount: "1e-7", assetCode: "USDC" })
+    ).toThrow(/valor não numérico/);
+
+    expect(() =>
+      assertPaymentMatches(s, { destination: DEST, amount: "10.12345678", assetCode: "USDC" })
+    ).toThrow(/valor não numérico/);
+
+    expect(() =>
+      assertPaymentMatches(s, { destination: DEST, amount: "", assetCode: "USDC" })
+    ).toThrow(/valor não numérico/);
+  });
+
+  it("passes exact 7-decimal identical amounts without floating point precision decay", () => {
+    const s = decodeTx(sampleXdr("1234.5678901"), "PUBLIC");
+    expect(() =>
+      assertPaymentMatches(s, { destination: DEST, amount: "1234.5678901", assetCode: "USDC" })
+    ).not.toThrow();
+
+    // Short fractional string "10.5" normalizes to same stroops as "10.5000000"
+    const sShort = decodeTx(sampleXdr("10.5"), "PUBLIC");
+    expect(() =>
+      assertPaymentMatches(sShort, { destination: DEST, amount: "10.5000000", assetCode: "USDC" })
+    ).not.toThrow();
+  });
 });
+
 
