@@ -1,17 +1,19 @@
 {
   "name": "@slippay/attester",
   "version": "0.1.0",
-  "description": "Chain-agnostic agent-integrity oracle. Signs a payment attestation ONLY when the requesting agent stays within its committed tool/recipient surface. The attestation the Soroban gate (autocharge_attested) and any chain's verifier consume — the question x402/Stripe don't ask: is the agent compromised?",
+  "description": "Chain-agnostic agent-integrity oracle. Signs a payment attestation ONLY when the requesting agent stays within its committed tool/recipient surface. The attestation the Soroban gate (autocharge_attested) and any chain's verifier consume \u2014 the question x402/Stripe don't ask: is the agent compromised?",
   "type": "module",
   "license": "MIT",
   "author": "Manuel Galmanus <manuel@bluewaveai.online>",
-  "bin": { "slippay-attester": "./src/server.mjs" },
+  "bin": {
+    "slippay-attester": "./src/server.mjs"
+  },
   "exports": {
     ".": "./src/oracle.mjs",
     "./x402": "./src/x402.mjs"
   },
   "scripts": {
-    "start": "node src/server.mjs",
+    "start": "node init && node src/server.mjs",
     "test": "node src/oracle.test.mjs && SLIPPAY_ATTESTER_DATA=/tmp/slippay-x402-test.json node src/x402.test.mjs"
   },
   "dependencies": {
