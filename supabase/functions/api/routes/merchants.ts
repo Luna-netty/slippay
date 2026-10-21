@@ -11,6 +11,17 @@ import { StrKey } from "npm:@stellar/stellar-sdk";
 type AppUser = { id: string; email: string; [k: string]: unknown };
 type Vars = { user: AppUser; supabase: SupabaseClient };
 
+// The M4 lockdown migration (20260601230000_security_rls_lockdown.sql) revokes
+// table-level SELECT on merchants from `authenticated` and grants only the
+// non-secret columns. These routes run as the user (userClient), so select("*")
+// expands to api_key_hash and webhook_secret, which the role may not read:
+// Postgres answers 42501 insufficient_privilege and mapDbError turns that into
+// a 403, breaking merchant creation and profile reads. Name the safe columns
+// instead — they are exactly the ones the API returns anyway.
+const MERCHANT_SAFE_COLUMNS =
+  "id, auth_user_id, display_name, email, stellar_address, network, " +
+  "api_key_prefix, webhook_url, platform_fee_bp, active, created_at";
+
 const r = new Hono<{ Variables: Vars }>();
 
 r.post("/", requireJwt, async (c) => {
@@ -37,21 +48,21 @@ r.post("/", requireJwt, async (c) => {
       api_key_prefix: prefix,
       webhook_secret: webhookSecret,
     })
-    .select("*")
+    .select(MERCHANT_SAFE_COLUMNS)
     .single();
   if (error) {
     const m = mapDbError(error);
     return c.json({ error: m.code }, m.status as 400 | 409);
   }
-  const { api_key_hash: _h, webhook_secret: _s, ...safe } = data;
+  const safe = data;
   return c.json({ merchant: safe as Merchant, api_key: apiKey.plain }, 201);
 });
 
 r.get("/me", requireJwt, async (c) => {
   const sb = c.get("supabase");
-  const { data, error } = await sb.from("merchants").select("*").maybeSingle();
+  const { data, error } = await sb.from("merchants").select(MERCHANT_SAFE_COLUMNS).maybeSingle();
   if (error || !data) return c.json({ error: "not_found" }, 404);
-  const { api_key_hash: _h, webhook_secret: _s, ...safe } = data;
+  const safe = data;
   return c.json({ merchant: safe as Merchant });
 });
 
@@ -67,13 +78,13 @@ r.patch("/me", requireJwt, async (c) => {
     .from("merchants")
     .update(input)
     .eq("auth_user_id", user.id)
-    .select("*")
+    .select(MERCHANT_SAFE_COLUMNS)
     .single();
   if (error) {
     const m = mapDbError(error);
     return c.json({ error: m.code }, m.status as 400 | 409);
   }
-  const { api_key_hash, webhook_secret, ...safe } = data;
+  const safe = data;
   return c.json({ merchant: safe });
 });
 

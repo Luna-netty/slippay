@@ -13,7 +13,7 @@ import { join, extname } from "node:path";
 const SRC_ROOT = new URL("../src/", import.meta.url).pathname;
 
 /** Recursively collect every .tsx / .jsx / .ts file under SRC_ROOT. */
-function* walk(dir) {
+function* walk(dir: string): Generator<string> {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     const st = statSync(full);
@@ -29,10 +29,10 @@ function* walk(dir) {
 }
 
 /** Extract every <img ...> tag from a source file. */
-function extractImgTags(src) {
-  const tags = [];
+function extractImgTags(src: string): string[] {
+  const tags: string[] = [];
   // Match <img ...> including across newlines (multiline flag).
-  const re = /<img[^>]*>/g;
+  const re = /<img\b[^>]*>/g;
   for (const m of src.matchAll(re)) {
     tags.push(m[0]);
   }
@@ -40,7 +40,7 @@ function extractImgTags(src) {
 }
 
 /** Check whether an <img> tag has an `alt` attribute (even an empty one). */
-function hasAlt(imgTag) {
+function hasAlt(imgTag: string): boolean {
   // Match `alt="..."`, `alt=''`, `alt={...}` etc. — the attribute name
   // must be present.
   return /\balt\s*=/.test(imgTag);
@@ -63,9 +63,9 @@ describe("a11y: every <img> has an alt attribute (closes #86)", () => {
     describe(`\`${file.replace(SRC_ROOT, "src/")}\``, () => {
       for (let i = 0; i < imgs.length; i++) {
         it(`img #${i + 1} has an alt attribute`, () => {
-          expect(hasAlt(imgs[i])).toBe(true);
+          expect(hasAlt(imgs[i]!)).toBe(true);
           // Print the offending tag for easy debugging.
-          if (!hasAlt(imgs[i])) {
+          if (!hasAlt(imgs[i]!)) {
             console.error(`Missing alt in ${file}: ${imgs[i]}`);
           }
         });
