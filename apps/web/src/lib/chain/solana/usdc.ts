@@ -48,8 +48,9 @@ export function toBaseUnits(human: string): bigint {
 }
 
 /** Split a total (base units) into merchant + platform fee by basis points.
+ *  Canonical fee arithmetic specification: see docs/fees.md.
  *  Integer math: fee = floor(total*bp/10000), merchant = total - fee. The two
- *  ALWAYS sum to total exactly (no dust), unlike float toFixed splitting. */
+ *  ALWAYS sum to total exactly (net + fee = gross, no dust), unlike float toFixed splitting. */
 export function splitFee(totalBaseUnits: bigint, platformFeeBp: number): { merchant: bigint; fee: bigint } {
   if (!Number.isInteger(platformFeeBp) || platformFeeBp < 0 || platformFeeBp > 10_000) {
     throw new Error("invalid_fee_bp");

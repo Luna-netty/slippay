@@ -55,7 +55,11 @@ Deno.test("rate_limiter enforces hard maximum bucket count with LRU eviction", a
 Deno.test("rate_limiter does not evict the currently-active bucket during burst from other keys", async () => {
   __resetBuckets();
   const maxBuckets = 10;
-  const app = createMockApp(maxBuckets, 10, 1);
+  // Client A is touched 11 times below (once up front, then every third
+  // iteration). Capacity must exceed that or the final touch is legitimately
+  // rate limited and this test fails on a 429 rather than on eviction, which
+  // is what it is actually about.
+  const app = createMockApp(maxBuckets, 50, 1);
 
   // Client A is active
   await app.request("/ping", { headers: { "x-client-id": "client_A" } });
