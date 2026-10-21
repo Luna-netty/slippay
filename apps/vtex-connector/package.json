@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "SlipPay × VTEX Payment Provider Protocol connector (maps VTEX PPP onto SlipPay's API).",
+  "description": "SlipPay \u00d7 VTEX Payment Provider Protocol connector (maps VTEX PPP onto SlipPay's API).",
   "scripts": {
-    "dev": "node src/index.mjs",
-    "start": "node src/index.mjs"
+    "dev": "node init && node src/index.mjs",
+    "start": "node init && node src/index.mjs"
   }
 }

@@ -12,7 +12,14 @@ async function createMerchant() {
   const create = await req("/v1/merchants", {
     method: "POST",
     headers: { authorization: `Bearer ${s.session!.access_token}`, "content-type": "application/json" },
-    body: JSON.stringify({ display_name: "T", stellar_address: "G" + "A".repeat(55) }),
+    // A checksum-valid ed25519 address. "G" + "A".repeat(55) has the right
+    // shape but a bad CRC16, so POST /v1/merchants answered 400 and this
+    // helper returned an error body with no api_key — every caller then sent
+    // "Bearer undefined" and got 401.
+    body: JSON.stringify({
+      display_name: "T",
+      stellar_address: "GCEYFLGNHCW4EIEX5LAVYGIGPT2KLHHVB6EOUWKKALA2FT7RMCHI242P",
+    }),
   });
   return await create.json();
 }
@@ -287,5 +294,3 @@ Deno.test("GET /v1/x402/:slug sets platform_fee_bp and fee_usdc on order insert"
   assertEquals(orderData.platform_fee_bp, 297);
   assertEquals(orderData.fee_usdc, "0.1485000"); // 5.0 * 297 / 10000
 });
-
-
