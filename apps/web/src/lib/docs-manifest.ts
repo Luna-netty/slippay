@@ -26,6 +26,7 @@ const raw = import.meta.glob([
   "../../../../docs/README.md",
   "../../../../docs/quickstart.md",
   "../../../../docs/mainnet-readiness.md",
+  "../../../../docs/fees.md",
   // public directories
   "../../../../docs/api-reference/*.md",
   "../../../../docs/concepts/*.md",
@@ -74,7 +75,8 @@ const CATEGORY_RULES: Array<{ test: RegExp; category: DocCategory; order: number
 
   { test: /^concepts\/architecture$/,      category: "concepts",     order: 0 },
   { test: /^concepts\/non-custodial-settlement$/, category: "concepts", order: 1 },
-  { test: /^concepts\/regulatory$/,        category: "concepts",     order: 2 },
+  { test: /^fees$/,                        category: "concepts",     order: 2,  title: "Fee Arithmetic" },
+  { test: /^concepts\/regulatory$/,        category: "concepts",     order: 3 },
 
   { test: /^guides\/drop-in-sdk$/,         category: "guides",       order: 0 },
   { test: /^guides\/recurring-billing$/,   category: "guides",       order: 1 },

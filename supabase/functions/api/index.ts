@@ -155,6 +155,15 @@ app.get("*", async (c) => {
 
 if (import.meta.main) {
   const port = Number(Deno.env.get("PORT") ?? 8000);
+  try {
+    if (Deno.env.get("SUPABASE_URL") && Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
+      const { assertSchemaExposed } = await import("./lib/supabase.ts");
+      await assertSchemaExposed();
+    }
+  } catch (err) {
+    console.error("Startup database schema verification failed:", err);
+    Deno.exit(1);
+  }
   Deno.serve({ port }, app.fetch);
 }
 
