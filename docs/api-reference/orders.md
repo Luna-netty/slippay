@@ -168,9 +168,11 @@ See [webhooks reference](./webhooks.md) for payload shape.
 ## Notes on settlement math
 
 SlipPay charges a platform fee (default 2.97% / 297 bp, configurable per merchant via
-`platform_fee_bp`). The buyer pays `usdc_amount`; the merchant receives
-`usdc_amount * (1 - platform_fee_bp / 10000)`. The platform receives the rest.
+`platform_fee_bp`). For the exact integer formulas, rounding direction (dust accrues
+to the merchant), conservation identity (`net + fee = gross`), and overpayment policy,
+see the [Fee Arithmetic and Rounding Specification](../fees.md).
 
+The buyer pays `usdc_amount`; the merchant receives `usdc_amount - fee_usdc`.
 The matcher accepts the payment as `paid` only if the on-chain amount is
 **>= the expected merchant share**. This way the buyer can pay the gross or
 the net depending on the wallet flow; either is accepted. Future versions may

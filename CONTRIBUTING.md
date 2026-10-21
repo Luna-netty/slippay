@@ -1,1 +1,136 @@
-IyBDb250cmlidXRpbmcgdG8gc2xpcHBheQoKYHNsaXBwYXlgIGlzIHBhcnQgb2YgdGhlIFtzbGlwcGF5LWxhYnNdKGh0dHBzOi8vZ2l0aHViLmNvbS9zbGlwcGF5LWxhYnMpIG9yZ2FuaXNhdGlvbiBhbmQgaXMKZGV2ZWxvcGVkIGluIHRoZSBvcGVuLiBDb250cmlidXRpb25zIG9mIGV2ZXJ5IHNpemUgYXJlIHdlbGNvbWUuCgojIyBGaW5kaW5nIHdvcmsKCk9wZW4gdGFza3MgYXJlIHB1Ymxpc2hlZCBhcyBib3VudHkgaXNzdWVzIG9uIHRoZSBpc3N1ZSB0cmFja2VyOgoKKiogaHR0cHM6Ly9naXRodWIuY29tL3NsaXBwYXktbGFicy9zbGlwcGF5L2lzc3VlcyoqCgotIEVhY2ggaXNzdWUgdGl0bGUgY2FycmllcyBpdHMgYm91bnR5LCBmb3IgZXhhbXBsZSBgW0JvdW50eTogJDYwXSBBZGQgdW5pdCB0ZXN0cyBmb3IgLi4uYC4KLSAgSWYgeW91IGFyZSBuZXcgdG8gdGhlIGNvZGViYXNlLCBzdGFydCB3aXRoIGlzc3VlcyBsYWJlbGxlZCBgZ29vZCBmaXJzdCBpc3N1ZWAuCi0gQ29tbWVudCBvbiB0aGUgaXNzdWUgYmVmb3JlIHlvdSBiZWdpbiBzbyBpdCBjYW4gYmUgYXNzaWduZWQgdG8geW91LgoKIyMgTG9jYWwgYm9vdHN0cmFwCgpUaGlzIHNlY3Rpb24gdGFrZXMgeW91IGZyb20gYSBmcmVzaCBjbG9uZSB0byBhIGdyZWVuIHdvcmtzcGFjZSB0ZXN0IHJ1bi4gSXQgaXMKdGhlIHNhbWUgcGF0aCB0aGF0IENJIGV4ZWN1dGVzIChzZWUgYC5naXRodWIvd29ya2Zsb3dzL3Rlc3QueW1sYCksIHNvIHRoZQpkb2N1bWVudGVkIGZsb3cgaXMgdGhlIHRlc3RlZCBmbG93LgoKIyMjIFByZXJlcXVpc2l0ZXMKCkluc3RhbGwgdGhlc2UgYmVmb3JlIHJ1bm5pbmcgdGhlIGJvb3RzdHJhcCBzY3JpcHQuIFZlcnNpb25zIG1hdGNoIHRob3NlIHBpbm5lZCBpbgpDSSAoYC5naXRodWIvd29ya2Zsb3dzL3Rlc3QueW1sYCk7IGtlZXAgdGhlbSBpbiBzeW5jIHdoZW4geW91IGJ1bXAgdGhlbS4KCnwgVG9vbCAgICAgICAgICAgIHwgVmVyc2lvbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCBVc2VkIGZvciAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfAp8IC0tLS0tLS0tLS0tLS0tLSB8IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSB8IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIHwKfCBOb2RlLmpzICAgICAgICAgfCAyMiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgV29ya3NwYWNlIGJ1aWxkIGFuZCB0ZXN0cyAgICAgICAgICAgICAgICAgIHwKfCBwbnBtICAgICAgICAgICAgIHwgOS4xMiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8IFBhY2thZ2UgbWFuYWdlciAoY29yZXBhY2sgZW5mb3JjZWQpICAgICAgICAgICAgfAp8IERlbm8gICAgICAgICAgICB8IDIueCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgQVBJIGFuZCBsaXN0ZW5lciB0ZXN0cyAgICAgICAgICAgICAgICAgICAgIHwKfCBSdXN0IChjYXJnbykgICAgIHwgU3RhYmxlIHRvb2xjaGFpbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCBDb250cmFjdHMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8CnwgejMgICAgICAgICAgICAgIHwgNC54ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgQVhMIGdhdGUgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwKfCBEb2NrZXIgKyBDb21wb3NlICB8IEN1cnJlbnQgc3RhYmxlICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCBTdXBhYmFzZSAobG9jYWwgc3RhY2spICAgICAgICAgICAgICAgICAgICAgIHwKCk5vZGUgMjIsIHBucG0gOS4xMiBhbmQgRGVubyAyLnggYXJlIHRoZSB2ZXJzaW9ucyBwaW5uZWQgaW4gQ0kuIFJ1c3QgYW5kIHozIGFyZSBvbmx5Cm5lZWRlZCBmb3IgdGhlIGNvbnRyYWN0IGFuZCBBWEwgZ2F0ZSB0aWVycy4KCiMjIyBPbmUtc3RlcCBzZXR1cAoKUnVuIHRoZSBib290c3RyYXAgc2NyaXB0IGZyb20gdGhlIHJlcG9zaXRvcnkgcm9vdDoKCmBgYGJhc2gKLi9zY3JpcHRzL2Jvb3RzdHJhcC5zaApgYGAKClRoZSBzY3JpcHQgaXMgbm9uLWludGVyYWN0aXZlIGFuZCBwZXJmb3JtcyB0aGUgc2FtZSBzdGVwcyBhcyBDSToKCjEuIENoZWNrcyB0aGUgcHJlcmVxdWlzaXRlIHRvb2wgdmVyc2lvbnMuCjIuIENvcGllcyB0aGUgZGV2ZWxvcGVyIGVudiBmaWxlcyBmcm9tIHRoZWlyIHRlbXBsYXRlcyAoc2VlIGJlbG93KS4KMy4gUnVucyBgcG5wbSBpbnN0YWxsIC0tZnJvemVuLWxvY2tmaWxlYC4KNC4gQnVpbGRzIGBAc2xpcHBheS9zaGFyZWRgIGZpcnN0LCB0aGVuIHRoZSB3ZWIgYW5kIGxpc3RlbmVyIHBhY2thZ2VzICh0aGUKICAgcmVxdWlyZWQgYnVpbGQgb3JkZXIgZW5mb3JjZWQgaW4gYC5naXRodWIvd29ya2Zsb3dzL3Rlc3QueW1sYCkuCjUuIFN0YXJ0cyB0aGUgU3VwYWJhc2kgc3RhY2sgKGBwbnBtIHN1cGFiYXNlOnN0YXJ0YCkgYW5kIGFwcGxpZXMgbWlncmF0aW9ucwo   IChgcG5wbSBzdXBhYmFzZTpyZXNldGApLgoKVG8gcnVuIHRoZSBzdGVwcyBtYW51YWxseToKCmBgYGJhc2gKcG5wbSBpbnN0YWxsIC0tZnJvemVuLWxvY2tmaWxlCnBucG0gLS1maWx0ZXIgQHNsaXBwYXkvc2hhcmVkIGJ1aWxkCnBucG0gLS1maWx0ZXIgQHNsaXBwYXkvd2ViIGJ1aWxkCnBucG0gLS1maWx0ZXIgQHNsaXBwYXkvbGlzdGVuZXIgYnVpbGQKcG5wbSBzdXBhYmFzZTpzdGFydApwbnBtIHN1cGFiYXNlOnJlc2V0CmBgYAoKIyMjIEVudmlyb25tZW50IGZpbGVzCgpUaGUgcmVwbyBzaGlwcyB0ZW1wbGF0ZXMsIG5vdCBzZWNyZXRzLiBDb3B5IGVhY2ggdGVtcGxhdGUgdG8gaXRzIHdvcmtpbmcgbmFtZSBhbmQKZmlsbCBpbiB0aGUgdmFsdWVzIGZyb20geW91ciBvd24gU3VwYWJhc2kgbG9jYWwgc3RhY2sgKGBwbnBtIHN1cGFiYXNlOnN0YXR1c2AKcHJpbnRzIHRoZSBsb2NhbCBrZXlzKSBvciBmcm9tIHRoZSBjcmVkZW50aWFscyBwcm92aWRlZCB0byB5b3UgYnkgdGhlIHRlYW0uCgp8IFRlbXBsYXRlICAgICAgICAgICAgICAgfCBXb3JraW5nIGZpbGUgICAgICAgICAgICAgfCBQdXJwb3NlICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8CnwgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSB8IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gfCAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLXwKfCBgLmVudi5leGFtcGxlYCAgICAgICAgIHwgYC5lbnZgICAgICAgICAgICAgICAgICAgIHwgUm9vdCB3b3Jrc3BhY2UgdmFyaWFibGVzICAgICAgICAgICAgICAgICAgICAgICAgICAgfAp8IGAuZW52LmRvY2tlci5leGFtcGxlYCAgfCBgLmVudi5kb2NrZXJgICAgICAgICAgICAgIHwgRG9ja2VyIENvbXBvc2Ugc3RhY2sgdmFyaWFibGVzICAgICAgICAgICAgICAgICAgICAgfAp8IEFwcC1sZXZlbCB0ZW1wbGF0ZXMgICAgIHwgQXBwLWxldmVsIGAuZW52LmxvY2FsYCAgICB8IFBlci1hcHAgdmFyaWFibGVzICh3ZWIsIGxpc3RlbmVyLCBBUEksIGNvbnRyYWN0cykgICB8CgpgLmVudi5sb2NhbC5jaWAgYGlzIHRyYWNrZWQgYmVjYXVzZSBpdCBleGlzdHMgdG8gc2VydmUgQ0ksIG5vdCBkZXZlbG9wbWVudC4gRG8gbm90CmVkaXQgaXQgZm9yIGxvY2FsIHdvcms7IHB1dCB5b3VyIG93biB2YWx1ZXMgaW4gdGhlIHdvcmtpbmcgYC5lbnZgIGZpbGVzIGluc3RlYWQuCgojIyMgVGVzdCB0aWVycwoKUnVuIHRoZSB0aWVycyBpbiB0aGlzIG9yZGVyLiBUaGUgd29ya3NwYWNlIHRpZXIgbXVzdCBwYXNzIGJlZm9yZSB0aGUgcmVzdC4KCmBgYGJhc2gjIFdvcmtzcGFjZSAocGFja2FnZXMgYW5kIGFwcHMpCnBucG0gdGVzdAoKIyBBUEkgKERlbm8pCnBucG0gYXBpOnRlc3QKCiMgTGlzdGVuZXIgZS10by1lIChyZXF1aXJlcyBTdXBhYmFzZSBydW5uaW5nKQpwbTnBuIC0tZmlsdGVyIEBzbGlwcGF5L2xpc3RlbmVyIHRlc3Q6ZTJlCgojIENvbnRyYWN0cyAoUnVzdCkKY2FyZ28gdGVzdCAtLW1hbmlmZXN0LXBhdGggY29udHJhY3RzL0NhcmdvLnRvbWwKCiMgQVhMIGdhdGUgKHozKQpwbTnBuIHBvbGljeS1jaGVja291dDpzcGlrZQpgYGAKCiMjIyBUaWVycyB0aGF0IHJ1biB3aXRob3V0IG5ldHdvcmsgb3IgY3JlZGVudGlhbHMKCi0gV29ya3NwYWNlIHRlc3RzIChgcG5wbSB0ZXN0YCkgcnVuIG9mZmxpbmUgYW5kIG5lZWQgbm8gZXh0ZXJuYWwgY3JlZGVudGlhbHMuCi0gQ29udHJhY3QgdGVzdHMgKGBjYXJnbyB0ZXN0YCkgcnVuIG9mZmxpbmUgb25jZSBkZXBlbmRlbmNpZXMgYXJlIGZldGNoZWQuCi0gQVhMIGdhdGUgKGBwbTnBuIHBvbGljeS1jaGVja291dDpzcGlrZWApIHJ1bnMgb2ZmbGluZS4KCkFQSSB0ZXN0cyBhbmQgbGlzdGVuZXIgZS10by1lIHRlc3RzIG5lZWQgdGhlIGxvY2FsIFN1cGFiYXNlIHN0YWNrIHJ1bm5pbmcgKGBwbnBtCnN1cGFiYXNlOnN0YXJ0YCkuIFRoZXkgZG8gbm90IG5lZWQgZXh0ZXJuYWwgY3JlZGVudGlhbHMgYmV5b25kIHRoZSBsb2NhbCBTdXBhYmFzZQprZXlzLgoKIyMgTWFraW5nIHRoZSBjaGFuZ2UKCjEuIEZvcmsgdGhlIHJlcG9zaXRvcnkgYW5kIGJyYW5jaCBmcm9tIHRoZSBkZWZhdWx0IGJyYW5jaC4KMi4gS2VlcCB0aGUgY2hhbmdlIHNjb3BlZCB0byB0aGUgaXNzdWUncyBhY2NlcHRhbmNlIGNyaXRlcmlhLgozLiBSdW4gdGhlIGV4aXN0aW5nIHRlc3QgYW5kIGxpbnQgY29tbWFuZHMgYmVmb3JlIHlvdSBjb21taXQuCgojIyBPcGVuaW5nIGEgcHVsbCByZXF1ZXN0CgotIFJlZmVyZW5jZSB0aGUgaXNzdWUgaW4gdGhlIGRlc2NyaXB0aW9uLCBmb3IgZXhhbXBsZSBgQ2xvc2VzICMxMmAuCi0gT25lIGlzc3VlIHBlciBwdWxsIHJlcXVlc3QuCi0gTWFrZSBzdXJlIENJIHBhc3NlcyBiZWZvcmUgcmVxdWVzdGluZyByZXZpZXcuCgojIyBSZXBvcnRpbmcgYSBidWcKCk9wZW4gYW4gaXNzdWUgd2l0aCBzdGVwcyB0byByZXByb2R1Y2UsIHRoZSBleHBlY3RlZCByZXN1bHQgYW5kIHRoZSBhY3R1YWwgcmVzdWx0LgoKIyMgU2VjdXJpdHkKClBsZWFzZSBkbyAqKm5vdCoqIHJlcG9ydCBzZWN1cml0eSB2dWxuZXJhYmlsaXRpZXMgdmlhIHB1YmxpYyBHaXRIdWIgaXNzdWVzLiBTZWUgW1NFQ1VSSVRZLm1kXShTRUNVUklUWS5tZCkgZm9yIG91ciBwcml2YXRlIGRpc2Nsb3N1cmUgY2hhbm5lbHMsIFNMQXMsIGFuZCBpbmNpZGVudCByZXNwb25zZSBwcm9jZWR1cmVzLgoKIyMgUXVlc3Rpb25zCgpBc2sgb24gdGhlIGlzc3VlIHRocmVhZCBzbyB0aGUgZGlzY3Vzc2lvbiBzdGF5cyBhbG9uZ3NpZGUgdGhlIHRhc2suCg==
+# Contributing to slippay
+
+`slippay` is part of the [slippay-labs](https://github.com/slippay-labs) organisation and is
+developed in the open. Contributions of every size are welcome.
+
+## Finding work
+
+Open tasks are published as bounty issues on the issue tracker:
+
+**https://github.com/slippay-labs/slippay/issues**
+
+- Each issue title carries its bounty, for example `[Bounty: $60] Add unit tests for ...`.
+- If you are new to the codebase, start with issues labelled `good first issue`.
+- Comment on the issue before you begin so it can be assigned to you.
+
+## Local bootstrap
+
+This section takes you from a fresh clone to a green workspace test run. It is
+the same path that CI executes (see `.github/workflows/test.yml`), so the
+documented flow is the tested flow.
+
+### Prerequisites
+
+Install these before running the bootstrap script. Versions match those pinned in
+CI (`.github/workflows/test.yml`); keep them in sync when you bump them.
+
+| Tool            | Version                                                              | Used for                          |
+| --------------- | -------------------------------------------------------------------- | --------------------------------- |
+| Node.js         | 22                                                                   | Workspace build and tests         |
+| pnpm            | 9.12                                                                 | Package manager (corepack enforced) |
+| Deno            | 2.x                                                                  | API and listener tests            |
+| Rust (cargo)    | Stable toolchain                                                     | Contracts                         |
+| z3              | 4.x                                                                  | AXL gate                          |
+| Docker + Compose| Current stable                                                       | Supabase (local stack)            |
+
+Node 22, pnpm 9.12 and Deno 2.x are the versions pinned in CI. Rust and z3 are only
+needed for the contract and AXL gate tiers.
+
+### One-step setup
+
+Run the bootstrap script from the repository root:
+
+```bash
+./scripts/bootstrap.sh
+```
+
+The script is non-interactive and performs the same steps as CI:
+
+1. Checks the prerequisite tool versions.
+2. Copies the developer env files from their templates (see below).
+3. Runs `pnpm install --frozen-lockfile`.
+4. Builds `@slippay/shared` first, then the web and listener packages (the
+   required build order enforced in `.github/workflows/test.yml`).
+5. Starts the Supabase stack (`pnpm supabase:start`) and applies migrations
+   (`pnpm supabase:reset`).
+
+To run the steps manually:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm --filter @slippay/shared build
+pnpm --filter @slippay/web build
+pnpm --filter @slippay/listener build
+pnpm supabase:start
+pnpm supabase:reset
+```
+
+### Environment files
+
+The repo ships templates, not secrets. Copy each template to its working name and
+fill in the values from your own Supabase local stack (`pnpm supabase:status`
+prints the local keys) or from the credentials provided to you by the team.
+
+| Template               | Working file             | Purpose                                                           |
+| ---------------------- | ------------------------ | ----------------------------------------------------------------- |
+| `.env.example`         | `.env`                   | Root workspace variables                                          |
+| `.env.docker.example`  | `.env.docker`            | Docker Compose stack variables                                    |
+| App-level templates    | App-level `.env.local`   | Per-app variables (web, listener, API, contracts)                 |
+
+`.env.local.ci` is tracked because it exists to serve CI, not development. Do not
+edit it for local work; put your own values in the working `.env` files instead.
+
+### Test tiers
+
+Run the tiers in this order. The workspace tier must pass before the rest.
+
+```bash
+# Workspace (packages and apps)
+pnpm test
+
+# API (Deno)
+pnpm api:test
+
+# Listener e-to-e (requires Supabase running)
+pnpm --filter @slippay/listener test:e2e
+
+# Contracts (Rust)
+cargo test --manifest-path contracts/Cargo.toml
+
+# AXL gate (z3)
+pnpm policy-checkout:spike
+```
+
+### Tiers that run without network or credentials
+
+- Workspace tests (`pnpm test`) run offline and need no external credentials.
+- Contract tests (`cargo test`) run offline once dependencies are fetched.
+- AXL gate (`pnpm policy-checkout:spike`) runs offline.
+
+API tests and listener e-to-e tests need the local Supabase stack running (`pnpm
+supabase:start`). They do not need external credentials beyond the local Supabase
+keys.
+
+## Making the change
+
+1. Fork the repository and branch from the default branch.
+2. Keep the change scoped to the issue's acceptance criteria.
+3. Run the existing test and lint commands before you commit.
+
+## Opening a pull request
+
+- Reference the issue in the description, for example `Closes #12`.
+- One issue per pull request.
+- Make sure CI passes before requesting review.
+
+## Reporting a bug
+
+Open an issue with steps to reproduce, the expected result and the actual result.
+
+## Security
+
+Please do **not** report security vulnerabilities via public GitHub issues. See [SECURITY.md](SECURITY.md) for our private disclosure channels, SLAs, and incident response procedures.
+
+## Questions
+
+Ask on the issue thread so the discussion stays alongside the task.
